@@ -1,0 +1,24 @@
+ul#mainLinks {
+        list-style: none;
+            float: left;
+            margin-right: 50px;
+            display: block;
+            width: 95%;
+            text-align: right;
+        }
+li {
+            display: inline;
+            margin: 5px;
+        }
+span#title {
+         display: block;
+            margin: 10px;
+            text-align: center;
+        }
+ div#subNav {
+            float: left;
+            display:block;
+            content: " ";
+            width: 10%;
+            height: 100px;
+}

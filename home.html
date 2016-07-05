@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Breadcrumb Navigation</title>
+    <style>
+			#mainContainer{
+				margin:auto auto;
+				width:90%;
+				display:block;
+				text-align:center;
+				float:left;
+			}
+			#container{
+				background-color: green;
+				margin: 20px auto;
+				height: 280px;
+				text-align: center;
+				width: 50%;
+			}
+			#loadPage{
+				margin-top:30px;
+				width:100px;
+				height:50px;
+				text-align:center;
+			}
+            #mainLinks {
+				list-style: none;
+                float: left;
+                display: block;
+                width: 100%;
+				text-align: center;
+				margin: 20px 0;
+				padding: 0;
+            }
+            li {
+                display: inline;
+                margin: 5px;
+            }
+			#mainLinks li a{
+				font-size:35px;
+				color:lime;
+			}
+            #header,#footer {
+				text-align: center;
+				color: magenta;
+				margin: 20px 0;
+				font-size: 30px;
+            }
+            #subNav {
+                float: left;
+				display: block;
+				content: " ";
+				width: 100%;
+				height: 50px;
+            }
+			#subNav a{
+			    font-size: 25px;
+				color:red;
+			}
+    </style>
+
+    <script type="text/javascript"> 
+        function Main(){
+            var pagesArry = [], currentPage, c,
+                navs = [ { link : "P0", target : "p0"},
+						 { link : "P1", target : "p1"},
+                         { link : "P2", target : "p2"},
+						 { link : "P3", target : "p3"},
+                         { link : "P4", target : "p4"}];
+						 
+			pagesArry["p0"] = new Page({header : "P-0 Header", footer: "P-0 Footer", bodyContent : "This is P 0 content",  subpages:[]});
+            pagesArry["p1"] = new Page({header : "P-1 Header", footer: "P-1 Footer", bodyContent : "This is P 1 content",  subpages:[]});
+            pagesArry["p2"] = new Page({header : "P-2 Header", footer: "P-2 Footer", bodyContent : "This is P 2 content", subpages:[]});
+			pagesArry["p3"] = new Page({header : "P-3 Header", footer: "P-3 Footer", bodyContent : "This is P 3 content",  subpages:[]});
+            pagesArry["p4"] = new Page({header : "P-4 Header", footer: "P-4 Footer", bodyContent : "This is P 4 content", subpages:[]});
+
+            this.loadContent = function(){
+				var maindiv = document.createElement("div");
+                maindiv.setAttribute("id", "container");				
+				document.getElementById("subContainer").appendChild(maindiv);
+				currentPage = pagesArry["p1"];
+				this.showpage();
+            };
+            this.setPage = function(p){
+				currentPage = pagesArry[p]
+				c = p;
+            };
+
+            this.showpage = function(){
+				pagesArry[c].render();
+				if(c === "p3"){
+					currentPage.setSubpage({header : "SubPage 3 Header", footer: "subPage 3 Footer", bodyContent : "This is subpage 3 content", link: { text : "Sub Page 3", page : "s3"}})
+				}	  
+            },
+            this.dispsubpage = function(s){
+               currentPage.dispsubpage(s);
+            };
+            this.loadNavigation = function(){
+                var ul = document.createElement("ul");
+                    ul.setAttribute("id", "mainLinks");
+                 for(i=0; i < navs.length; i++){
+                    var li = document.createElement("li"),
+                        a = document.createElement("a");
+					a.innerHTML = navs[i].link;
+					a.setAttribute("href", "#");
+					a.setAttribute("onClick", "showpage('"+navs[i].target+"')")
+                    li.appendChild(a);
+                    ul.appendChild(li);
+                 }
+                 document.getElementById("subContainer").appendChild(ul);
+            }
+
+        }
+
+        function Page(page){
+            var header = document.createElement("div"),
+                footer = document.createElement("div"),
+				content = document.createElement("div"),
+                sub = document.createElement("div");
+                header.setAttribute("id", "header");
+				footer.setAttribute("id", "footer");
+                content.setAttribute("id", "content");
+                sub.setAttribute("id", "subNav");
+            this.subpages = {};
+            var addHeader = function(){
+                header.innerHTML = page.header;
+                document.getElementById("container").appendChild(header);
+            };
+			var addFooter = function(){
+				footer.innerHTML = page.footer;
+                document.getElementById("container").appendChild(footer);
+			};
+            var addSideBar = function(){
+                document.getElementById("container").appendChild(sub);
+            };
+
+            var addContent = function(){
+                content.innerHTML = page.bodyContent;
+                document.getElementById("container").appendChild(content);
+            };
+
+            this.render = function (){
+                var container = document.getElementById("container");
+                while (container.hasChildNodes()) {   
+                    container.removeChild(container.firstChild);
+                }
+				addSideBar();
+                addHeader();
+                addContent();
+				addFooter();
+            }
+            this.dispsubpage = function(s){
+                document.getElementById("header").innerHTML = this.subpages[s].header;
+                document.getElementById("content").innerHTML = this.subpages[s].bodyContent;		
+            }
+			this.removeChilds = function(node){
+				while (node.firstChild) {
+					node.removeChild(node.firstChild);
+				}
+			}
+			this.setSubpage = function(subpage){
+                this.subpages[subpage.link.page] = subpage;
+                var a = document.createElement("a");
+				a.innerHTML = subpage.link.text;
+				a.setAttribute("href", "#");
+				a.setAttribute("onClick", "dispsubpage('"+subpage.link.page+"')");
+				this.removeChilds(document.getElementById("subNav"));
+				document.getElementById("subNav").appendChild(a);
+           }
+        }
+        var main = new Main();
+        function showpage(pg){
+            main.setPage(pg);
+            main.showpage();
+        }
+        function loadContent(){
+			document.getElementById("subContainer").innerHTML="";
+            main.loadNavigation();
+            main.loadContent();
+        }
+        function dispsubpage(s){
+            main.dispsubpage(s);
+        }
+    </script>
+    </head>
+    <body>
+		<div id="mainContainer">
+			<input id="loadPage" type="submit" value="Load Page" onClick="loadContent()"/>
+			<div id="subContainer"></div>
+		</div>
+    </body>
+</html>    
